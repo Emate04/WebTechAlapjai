@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felhasználó keresés</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <ul>
+                <li><a href="index.html">Főoldal</a></li>
+                <li><a href="user-search.html">Felhasználó keresés</a></li>
+            </ul>
+        </nav>
+        <h1>Felhasználó keresés</h1>
+        <div class="input-group">
+            <label for="searchInput">Keresett felhasználónév:</label>
+            <input type="text" id="searchInput" placeholder="Keresés...">
+            <button id="searchButton">Keresés</button>
+        </div>
+        <ul id="resultList"></ul>
+    </div>
+    <script>
+        document.getElementById("searchButton").addEventListener("click", function() {
+            const searchInput = document.getElementById("searchInput").value.trim();
+
+            if (searchInput === "") {
+                alert("Hiba: Kérjük, adjon meg egy keresett felhasználónevet!");
+            } else {
+                // GitHub API kérés
+                const apiUrl = `https://api.github.com/search/users?q=${searchInput}`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultList = document.getElementById("resultList");
+                        resultList.innerHTML = ""; // Töröljük a korábbi keresési eredményeket
+
+                        if (data.items && data.items.length > 0) {
+                            data.items.forEach(user => {
+                                const listItem = document.createElement("li");
+                                
+                                // Felhasználó profilképének és nevének megjelenítése
+                                listItem.innerHTML = `
+                                    <img src="${user.avatar_url}" alt="${user.login}'s avatar" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 10px;">
+                                    <a href="${user.html_url}" target="_blank">${user.login}</a>
+                                `;
+                                resultList.appendChild(listItem);
+                            });
+                        } else {
+                            resultList.innerHTML = "<li>Nincs találat!</li>";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Hiba történt a keresés során:", error);
+                        alert("Hiba történt a keresés során! Próbálja újra.");
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
