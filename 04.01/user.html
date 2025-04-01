@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felhasználói adatlap</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html">Főoldal</a>
+        <a href="user-search.html">Felhasználó keresés</a>
+    </nav>
+
+    <div class="container">
+        <h1>Felhasználói adatlap</h1>
+        <div id="userProfile" class="profile-card"></div>
+    </div>
+
+    <script>
+        // Query paraméter kiolvasása az URL-ből
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Felhasználó adatainak lekérdezése
+        function fetchUserProfile(username) {
+            if (!username) {
+                document.getElementById("userProfile").innerHTML = "<p>Nincs megadva felhasználónév!</p>";
+                return;
+            }
+
+            const apiUrl = `https://api.github.com/users/${username}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(user => {
+                    const userProfile = document.getElementById("userProfile");
+                    userProfile.innerHTML = ""; // Előző tartalom törlése
+
+                    if (user.message === "Not Found") {
+                        userProfile.innerHTML = "<p>Nincs ilyen felhasználó!</p>";
+                        return;
+                    }
+
+                    let profileHTML = `
+                        <img src="${user.avatar_url}" alt="${user.login} profilképe" class="avatar">
+                        <h2>${user.name || user.login}</h2>
+                    `;
+
+                    if (user.bio) profileHTML += `<p><strong>Bemutatkozás:</strong> ${user.bio}</p>`;
+                    if (user.location) profileHTML += `<p><strong>Helyszín:</strong> ${user.location}</p>`;
+                    if (user.blog) profileHTML += `<p><strong>Blog:</strong> <a href="${user.blog}" target="_blank">${user.blog}</a></p>`;
+                    if (user.public_repos) profileHTML += `<p><strong>Nyilvános repók:</strong> ${user.public_repos}</p>`;
+                    if (user.followers) profileHTML += `<p><strong>Követők:</strong> ${user.followers}</p>`;
+
+                    userProfile.innerHTML = profileHTML;
+                })
+                .catch(error => {
+                    console.error("Hiba történt a felhasználói adat lekérésekor:", error);
+                    document.getElementById("userProfile").innerHTML = "<p>Hiba történt a felhasználó betöltésekor.</p>";
+                });
+        }
+
+        // Futtatás, ha van 'id' paraméter az URL-ben
+        const username = getQueryParam("id");
+        fetchUserProfile(username);
+    </script>
+</body>
+</html>
