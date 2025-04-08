@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kedvenc GitHub Repozitóriumok</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Főoldal</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Kedvenc GitHub Repo-k</h1>
+        <ul id="reposList">
+            <!-- A kedvenc repók itt fognak megjelenni -->
+        </ul>
+    </main>
+
+    <script>
+        // GitHub API hitelesítő token
+        const token = localStorage.getItem('github_token');
+
+        if (!token) {
+            alert("Nem vagy bejelentkezve!");
+            window.location.href = "index.html";
+        } else {
+            fetch('https://api.github.com/user/starred', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Hiba történt a kedvenc repók betöltésekor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const reposList = document.getElementById('reposList');
+                data.forEach(repo => {
+                    const li = document.createElement('li');
+                    const repoName = `${repo.owner.login}/${repo.name}`;
+                    const link = document.createElement('a');
+                    link.href = `repo.html?name=${repoName}`;
+                    link.textContent = repoName;
+                    li.appendChild(link);
+                    reposList.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Hiba:', error);
+                alert("Hiba történt a kedvenc repók betöltésekor.");
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repo Adatlap</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Főoldal</a></li>
+                <li><a href="starred-repos.html">Kedvenc Repo-k</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1 id="repoTitle">Repo adatai</h1>
+        <div id="repoDetails">
+            <p id="repoDescription">Betöltés...</p>
+        </div>
+        <button id="starButton">Kedvencnek jelöl</button>
+    </main>
+
+    <script>
+        // GitHub API hitelesítő token
+        const token = localStorage.getItem('github_token');
+        const urlParams = new URLSearchParams(window.location.search);
+        const repoName = urlParams.get('name');
+
+        if (!repoName || !token) {
+            alert("Hibás URL vagy nem vagy bejelentkezve.");
+            window.location.href = "index.html";
+        } else {
+            const [owner, repo] = repoName.split('/');
+
+            // Betöltjük a repo adatait
+            fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `token ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Hiba történt a repo adatainak betöltésekor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const repoTitle = document.getElementById('repoTitle');
+                const repoDescription = document.getElementById('repoDescription');
+                const starButton = document.getElementById('starButton');
+
+                repoTitle.textContent = `${data.full_name}`;
+                repoDescription.textContent = data.description || "Nincs leírás.";
+                
+                // Ellenőrizzük, hogy már csillagozva van-e
+                fetch(`https://api.github.com/user/starred/${owner}/${repo}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `token ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        starButton.textContent = 'Kedvencekből eltávolít';
+                        starButton.onclick = () => unstarRepo(owner, repo);
+                    } else {
+                        starButton.textContent = 'Kedvencnek jelöl';
+                        starButton.onclick = () => starRepo(owner, repo);
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba:', error);
+                    alert("Hiba történt a csillagozás ellenőrzésekor.");
+                });
+            })
+            .catch(error => {
+                console.error('Hiba:', error);
+                alert("Hiba történt a repo adatainak betöltésekor.");
+            });
+
+            // Repo csillagozása
+            function starRepo(owner, repo) {
+                fetch(`https://api.github.com/user/starred/${owner}/${repo}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        alert('A repo sikeresen kedvencnek jelölve!');
+                        starButton.textContent = 'Kedvencekből eltávolít';
+                        starButton.onclick = () => unstarRepo(owner, repo);
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba:', error);
+                    alert("Hiba történt a csillagozás során.");
+                });
+            }
+
+            // Repo eltávolítása a kedvencekből
+            function unstarRepo(owner, repo) {
+                fetch(`https://api.github.com/user/starred/${owner}/${repo}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `token ${token}`
+                    }
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        alert('A repo sikeresen eltávolítva a kedvencekből!');
+                        starButton.textContent = 'Kedvencnek jelöl';
+                        starButton.onclick = () => starRepo(owner, repo);
+                    } else {
+                        alert("Hiba történt a kedvenc eltávolítása során.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Hiba:', error);
+                    alert("Hiba történt a csillagozás eltávolítása során.");
+                });
+            }
+        }
+    </script>
+</body>
+</html>
