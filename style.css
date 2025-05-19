@@ -1,0 +1,116 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6f8;
+  color: #1e1e2f;
+  line-height: 1.6;
+}
+
+header, footer {
+  background-color: #1e1e2f;
+  color: #ffffff;
+  text-align: center;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+header h1 {
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+footer p {
+  font-size: 0.9rem;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  padding: 2rem;
+}
+
+section {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  flex: 1 1 400px;
+  max-width: 500px;
+  min-width: 300px;
+  transition: transform 0.2s ease;
+}
+
+section:hover {
+  transform: translateY(-5px);
+}
+
+#car-list-section h2,
+#car-details-section h2 {
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #1e1e2f;
+  padding-bottom: 0.5rem;
+  color: #1e1e2f;
+}
+
+#car-list {
+  list-style: none;
+}
+
+#car-list li {
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  background-color: #f0f3fa;
+  border-left: 4px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#car-list li:hover {
+  background-color: #e2e8f0;
+  border-left: 4px solid #1e1e2f;
+}
+
+#car-list li.selected {
+  background-color: #cde3ff;
+  font-weight: bold;
+  border-left: 4px solid #0074d9;
+}
+
+#car-details p {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid #0074d9;
+  background-color: #f9fbfd;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.detail-value {
+  margin-left: 0.5rem;
+  color: #555;
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  section {
+    max-width: 100%;
+  }
+}
